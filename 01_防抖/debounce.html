@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" />
+    <button id="cancel">取消</button>
+
+    <script src="./debounce.js"></script>
+    <script>
+      const inputEl = document.querySelector("input");
+      const btnEl = document.querySelector("#cancel");
+      let counter = 0;
+      const changeHandler = function (event) {
+        console.log(`第${++counter}次点击`, this, event);
+        return "aaa";
+      };
+      const debouncedChange = debounce(changeHandler, 1000, true, (res) =>
+        console.log(res)
+      );
+      inputEl.oninput = debouncedChange;
+      btnEl.onclick = () => {
+        debouncedChange.cancel();
+      };
+    </script>
+  </body>
+</html>
