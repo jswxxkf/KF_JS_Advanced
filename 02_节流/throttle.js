@@ -133,7 +133,7 @@ function throttle(
         timer = null;
         const res = fn.apply(this, args);
         if (callback && typeof callback === "function") callback(res);
-        lastTime = !leading ? 0 : currTime;
+        lastTime = !leading ? 0 : new Date().getTime();
       }, remainTime);
     }
   }

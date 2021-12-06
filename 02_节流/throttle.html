@@ -20,7 +20,7 @@
         return "aaa";
       };
       const throttledChange = throttle(onChange, 2000, {
-        leading: false,
+        leading: true,
         trailing: true,
         callback: (res) => console.log(res),
       });

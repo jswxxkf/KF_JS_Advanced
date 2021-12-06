@@ -124,6 +124,7 @@ const obj = {
   s2: s2,
 };
 
+// 循环引用
 obj.info = obj;
 
 const newObj = deepClone(obj);
