@@ -7,6 +7,7 @@ function kfCurrying(fn) {
   function curried(...args) {
     // 判断传入参数的个数是否大于等于fn期待传入的参数个数
     // 当传入的参数已经大于等于fn期待的参数个数时, 就执行函数
+    // 同时也可以理解为递归的出口
     if (args.length >= fn.length) {
       // return fn.call(this, ...args);
       return fn.apply(this, args);
@@ -20,7 +21,6 @@ function kfCurrying(fn) {
       return curried2;
     }
   }
-
   return curried;
 }
 

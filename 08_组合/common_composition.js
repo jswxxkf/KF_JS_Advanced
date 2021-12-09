@@ -1,4 +1,5 @@
 function kfCompose(...fns) {
+  // edge case 传入的fns是否都是函数？
   const length = fns.length;
   for (let i = 0; i < length; ++i) {
     if (typeof fns[i] !== "function") {
@@ -7,6 +8,7 @@ function kfCompose(...fns) {
   }
   function compose(...args) {
     let index = 0;
+    // 若没有传入函数，则将入参原样返回即可
     let result = length ? fns[index].apply(this, args) : args;
     while (++index < length) {
       result = fns[index].call(this, result);
