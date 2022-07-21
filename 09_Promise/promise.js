@@ -26,6 +26,7 @@ class KFPromise {
         // 必须等待主线程同步代码执行完毕，即onFulfilledFns全部收集完毕，方可遍历执行
         // 并且与原生Promise保持一致，使onFulfilled与onRejected在微任务队列中执行
         queueMicrotask(() => {
+          // 微任务队列执行前，若此promise已经敲定，则不做任何处理
           if (this.status !== PROMISE_STATUS_PENDING) return;
           this.status = PROMISE_STATUS_FULFILLED;
           this.value = value;
@@ -42,6 +43,7 @@ class KFPromise {
           if (this.status !== PROMISE_STATUS_PENDING) return;
           this.status = PROMISE_STATUS_REJECTED;
           this.reason = reason;
+          // 一旦reject, 通知所有拒绝后的onRejected回调函数执行
           this.onRejectedFns.forEach((fn) => {
             fn(this.reason);
           });
@@ -123,8 +125,11 @@ class KFPromise {
     );
   }
 
-  // 执行resolve类方法，直接返回一个fulfilled promise
+  // ========== 以下为类方法 =========
+  // 执行resolve类方法，直接(立刻resolve)返回一个fulfilled promise
   // 此处仅考虑传入的value是一个普通值的情况
+  // 如果传入的是一个promise, 则其状态由传入的promise移交
+  // 如果传入的是一个thenable的对象，则由对象的then方法的返回值确定
   static resolve(value) {
     return new KFPromise((resolve) => resolve(value));
   }
@@ -202,6 +207,8 @@ class KFPromise {
       promises.forEach((promise) => {
         promise.then(resolve, (err) => {
           errors.push(err);
+          // onRejected回调的特殊处理:
+          // 每当有一个promise被拒绝, 都要判断是否是所有promise都被拒绝
           if (errors.length === promises.length) {
             reject(new AggregateError(errors));
           }
@@ -245,7 +252,7 @@ const p3 = new KFPromise((resolve, reject) => {
 
 KFPromise.any([p1, p2, p3])
   .then((res) => console.log("any: ", res))
-  .catch((aggregatedErr) => console.log(aggregatedErr));
+  .catch((aggregatedErr) => console.log(aggregatedErr.errors));
 
 KFPromise.race([p1, p2, p3]).then(
   (res) => console.log(res),
